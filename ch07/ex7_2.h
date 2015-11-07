@@ -29,6 +29,6 @@ Sales_data& combine(Sales_data& rhs)
     revenue += rhs.revenue;
     return *this;
 }
-
+//test
 #endif // EX7_2_H
 
