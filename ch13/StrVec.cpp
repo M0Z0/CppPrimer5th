@@ -8,6 +8,15 @@ StrVec::StrVec(const StrVec &s)
 	first_free = cap = newVec.second;
 }
 
+StrVec& StrVec::operator=(const StrVec &s)
+{
+	auto newVec = alloc_n_copy(s.begin(), s.end());
+	free();
+	elements = newVec.first;
+	first_free = cap = newVec.second;
+	return *this;
+}
+
 StrVec::~StrVec()
 {
 	free();
@@ -34,4 +43,18 @@ void StrVec::free()
 			alloc.destroy(--p);
 		alloc.deallocate(elements, cap - elements);
 	}
+}
+
+void StrVec::reallocate()
+{
+	auto newCapcity = size() ? 2 * size() : 1;
+	auto newData = alloc.allocate(newCapcity);
+	auto dest = newData;
+	auto ele = this->elements;
+	for (int i = 0; i != size(); ++i)
+		alloc.construct(dest++, std::move(ele));
+	free();
+	this->elements = newData;
+	this->first_free = dest;
+	this->cap = this->elements+newCapcity;
 }
