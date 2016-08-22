@@ -5,6 +5,7 @@ class StrVec{
 public:
 	StrVec() : elements(nullptr), first_free(nullptr), cap(nullptr) { }
 	StrVec(const StrVec&);
+	StrVec(std::initializer_list<std::string>);
 	StrVec& operator=(const StrVec&);
 	~StrVec();
 	void push_back(const std::string&);
@@ -23,4 +24,9 @@ private:
 	void free();
 	void reallocate();
 	std::pair<std::string*, std::string*> alloc_n_copy(const std::string*, const std::string*);
+	void alloc_n_move(size_t newCap);
+
+	void reserve(size_t newCap);
+	void resize(size_t count);
+	void resize(size_t count, const std::string&);
 };

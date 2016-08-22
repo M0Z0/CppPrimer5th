@@ -48,7 +48,12 @@ void StrVec::free()
 void StrVec::reallocate()
 {
 	auto newCapcity = size() ? 2 * size() : 1;
-	auto newData = alloc.allocate(newCapcity);
+	this->alloc_n_move(newCapcity);
+}
+
+void StrVec::alloc_n_move(size_t newCap)
+{
+	auto newData = alloc.allocate(newCap);
 	auto dest = newData;
 	auto ele = this->elements;
 	for (int i = 0; i != size(); ++i)
@@ -56,5 +61,35 @@ void StrVec::reallocate()
 	free();
 	this->elements = newData;
 	this->first_free = dest;
-	this->cap = this->elements+newCapcity;
+	this->cap = this->elements + newCap;
+}
+
+void StrVec::reserve(size_t new_cap)
+{
+	if (new_cap <= capacity()) return;
+	alloc_n_move(new_cap);
+}
+
+void StrVec::resize(size_t count)
+{
+	resize(count, std::string());
+}
+
+void StrVec::resize(size_t count, const std::string& s)
+{
+	if (count > size()) {
+		if (count > capacity()) reserve(count * 2);
+		for (size_t i = size(); i != count; ++i)
+			alloc.construct(first_free++, s);
+	}
+	else if (count < size()) {
+		while (first_free != elements + count) alloc.destroy(--first_free);
+	}
+}
+
+StrVec::StrVec(std::initializer_list<std::string> il)
+{
+	auto newdata = alloc_n_copy(il.begin(), il.end());
+	elements = newdata.first;
+	first_free = cap = newdata.second;
 }
